@@ -1,6 +1,20 @@
 from fastapi import FastAPI
+
 from app.api.upload import router as upload_router
+from app.api.qa import router as qa_router
 
-app = FastAPI(title="Compliance Copilot")
 
-app.include_router(upload_router)
+app = FastAPI(
+    title="Compliance Copilot API",
+    description="RAG-based compliance assistant running locally with open-source LLMs",
+    version="0.1.0"
+)
+
+
+app.include_router(upload_router, prefix="/api", tags=["Upload"])
+app.include_router(qa_router, prefix="/api", tags=["Q&A"])
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}

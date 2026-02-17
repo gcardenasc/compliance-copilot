@@ -1,39 +1,62 @@
 import re
 
-SPLIT_PATTERN = r"(Artículo\s+\d+|Sección\s+\d+|Capítulo\s+\w+)"
+STRUCTURE_PATTERN = (
+    r"(Art\.?\s*\d+|Artículo\s+\d+|"
+    r"Cap[ií]tulo\s+\w+|Sección\s+\w+|"
+    r"\d+\.\s+[A-Z].+|"           
+    r"Annex\s+[A-Z]|Appendix\s+[A-Z])"
+)
 
-def clean_text(text):
-    return " ".join(text.split())
 
-def split_by_structure(text):
-    parts = re.split(SPLIT_PATTERN, text)
+def clean_text(text: str) -> str:
+    text = re.sub(r"\r", "\n", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+def split_by_structure(text: str):
+    parts = re.split(STRUCTURE_PATTERN, text, flags=re.IGNORECASE)
+
+    if len(parts) < 3:
+        return []
 
     chunks = []
     for i in range(1, len(parts), 2):
         header = parts[i].strip()
         body = parts[i + 1] if i + 1 < len(parts) else ""
-        chunks.append(header + " " + body)
+        chunks.append(f"{header}\n{body}".strip())
+
     return chunks
 
-def chunk_by_length(text, size=800, overlap=100):
+
+def chunk_by_length(text: str, size=800, overlap=150):
     chunks = []
     start = 0
 
     while start < len(text):
         end = start + size
-        chunks.append(text[start:end])
+        chunk = text[start:end].strip()
+
+        if chunk:
+            chunks.append(chunk)
+
         start += size - overlap
 
     return chunks
 
-def chunking_pipeline(text):
+
+def chunking_pipeline(text: str):
     text = clean_text(text)
 
-    structured = split_by_structure(text)
+    structured_chunks = split_by_structure(text)
+
+    if not structured_chunks:
+        return chunk_by_length(text)
 
     final_chunks = []
-    for chunk in structured:
-        if len(chunk) > 1000:
+
+    for chunk in structured_chunks:
+        if len(chunk) > 1200:
             final_chunks.extend(chunk_by_length(chunk))
         else:
             final_chunks.append(chunk)

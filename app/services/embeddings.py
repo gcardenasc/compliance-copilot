@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 
-
+# LM Studio OpenAI-compatible endpoint
 client = OpenAI(
     base_url=os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234/v1"),
     api_key="lm-studio"
@@ -28,4 +28,5 @@ def embed_batch(texts: list[str]):
     )
     return [item.embedding for item in response.data]
 
-    
+# def embed_batch(texts: list[str]):
+#     return [embed_text(t) for t in texts]

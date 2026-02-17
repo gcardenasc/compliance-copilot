@@ -4,9 +4,14 @@ from app.rag.vector_store import add_documents
 
 
 def ingest_document(text: str, metadata=None):
+    print(">>> TEXTO RECIBIDO:", len(text))
+
     chunks = chunking_pipeline(text)
+    print(">>> CHUNKS GENERADOS:", len(chunks))
+
     embeddings = embed_batch(chunks)
-    
+    print(">>> EMBEDDINGS GENERADOS:", len(embeddings))
+
     add_documents(
         texts=chunks,
         embeddings=embeddings,
