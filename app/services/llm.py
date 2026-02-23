@@ -1,19 +1,18 @@
-import os
 from openai import OpenAI
 
+class LLMService:
 
-client = OpenAI(
-    base_url=os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234/v1"),
-    api_key="lm-studio"
-)
+    def __init__(self, model="deepseek/deepseek-r1-0528-qwen3-8b"):
+        self.client = OpenAI(
+            base_url="http://localhost:1234/v1",
+            api_key="lm-studio"  # puede ser cualquier string
+        )
+        self.model = model
 
-def generate_answer(prompt:str):
-    response = client.chat.completions.create(
-        model=os.getenv("LLM_MODEL", "local-model"),
-        messages=[
-            {"role": "system", "content": "Eres un asistente experto en compliance."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2
-    )
-    return response.choices[0].message.content
+    def chat(self, messages, tools=None, tool_choice="auto"):
+        return self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            tools=tools,
+            tool_choice=tool_choice
+        )

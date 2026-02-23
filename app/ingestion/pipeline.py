@@ -1,39 +1,43 @@
-from app.rag.chunking import chunking_pipeline
-from app.services.embeddings import embed_batch
-from app.rag.vector_store import add_documents
+from uuid import uuid4
+from app.services.embeddings import embed_texts
+from app.retrieval.vector_store import add_documents
+from app.ingestion.parser import parse_document
+from app.ingestion.chunking import chunk_text
 
+def ingest_document(file_path):
 
-def ingest_document(text: str, metadata: dict | None = None):
+    pages = parse_document(file_path)
+    doc_id = str(uuid4())
+    all_chunks = []
+    chunk_index = 0
 
-    print(">>> TEXTO RECIBIDO:", len(text))
+    print(f">>> Iniciando ingesta de {file_path.name}. Doc ID: {doc_id}")
 
-    chunk_dicts = chunking_pipeline(text)
-    print(">>> CHUNKS GENERADOS:", len(chunk_dicts))
+    for page in pages:
+        chunks = chunk_text(
+            page["text"],
+            page["page"],
+            file_path.name
+        )
 
-    texts = []
-    metadatas = []
+        for chunk in chunks:
+            chunk["metadata"]["doc_id"] = doc_id
+            chunk["metadata"]["chunk_index"] = chunk_index
+            chunk_index += 1
 
-    for chunk in chunk_dicts:
-        chunk_text = chunk["text"]
-        chunk_metadata = chunk.get("metadata", {}).copy()
+        all_chunks.extend(chunks)
 
-        # Merge metadata global si existe
-        if metadata:
-            chunk_metadata = {**chunk_metadata, **metadata}
+    print(f">>> Total chunks generados: {len(all_chunks)}")
 
-        texts.append(chunk_text)
-        metadatas.append(chunk_metadata)
+    texts = [c["text"] for c in all_chunks]
+    metadatas = [c["metadata"] for c in all_chunks]
+    
+    # Debug: mostrar el primer metadato
+    if metadatas:
+        print(f">>> Ejemplo metadato chunk 0: {metadatas[0]}")
 
-    # Seguridad estructural
-    assert len(texts) == len(metadatas)
+    embeddings = embed_texts(texts)
 
-    embeddings = embed_batch(texts)
-    print(">>> EMBEDDINGS GENERADOS:", len(embeddings))
+    add_documents(texts, embeddings, metadatas)
 
-    add_documents(
-        texts=texts,
-        embeddings=embeddings,
-        metadatas=metadatas
-    )
-
-    return len(texts)
+    return doc_id

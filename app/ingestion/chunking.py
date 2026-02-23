@@ -44,45 +44,18 @@ def split_large_paragraph(paragraph, max_chars=800):
     return chunks
 
 
-def chunk_text(text, max_chars=800):
-    text = clean_text(text)
-
-    paragraphs = re.split(r"\n\s*\n", text)
-
+def chunk_text(text: str, page: int, source: str):
+    paragraphs = text.split("\n\n")
     chunks = []
 
-    for p in paragraphs:
-        p = p.strip()
-        if not p:
-            continue
-
-        if len(p) > max_chars:
-            chunks.extend(split_large_paragraph(p, max_chars))
-        else:
-            chunks.append(p)
-
-    return chunks
-
-
-def chunking_pipeline(text, page=None, source=None, max_chars=800):
-    chunks = chunk_text(text, max_chars)
-
-    final_chunks = []
-
-    for chunk in chunks:
-        metadata = extract_metadata_from_chunk(chunk)
-
-        if page:
-            metadata["page"] = page
-
-        if source:
-            metadata["source"] = source
-
-        final_chunks.append({
-            "text": chunk,
-            "metadata": metadata
+    for i, p in enumerate(paragraphs):
+        chunks.append({
+            "text": p,
+            "metadata": {
+                "page": page,
+                "source": source,
+                "paragraph_index": i
+            }
         })
 
-    print(f">>> CHUNKS GENERADOS: {len(final_chunks)}")
-
-    return final_chunks
+    return chunks
