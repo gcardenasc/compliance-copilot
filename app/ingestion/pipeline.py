@@ -3,19 +3,37 @@ from app.services.embeddings import embed_batch
 from app.rag.vector_store import add_documents
 
 
-def ingest_document(text: str, metadata=None):
+def ingest_document(text: str, metadata: dict | None = None):
+
     print(">>> TEXTO RECIBIDO:", len(text))
 
-    chunks = chunking_pipeline(text)
-    print(">>> CHUNKS GENERADOS:", len(chunks))
+    chunk_dicts = chunking_pipeline(text)
+    print(">>> CHUNKS GENERADOS:", len(chunk_dicts))
 
-    embeddings = embed_batch(chunks)
+    texts = []
+    metadatas = []
+
+    for chunk in chunk_dicts:
+        chunk_text = chunk["text"]
+        chunk_metadata = chunk.get("metadata", {}).copy()
+
+        # Merge metadata global si existe
+        if metadata:
+            chunk_metadata = {**chunk_metadata, **metadata}
+
+        texts.append(chunk_text)
+        metadatas.append(chunk_metadata)
+
+    # Seguridad estructural
+    assert len(texts) == len(metadatas)
+
+    embeddings = embed_batch(texts)
     print(">>> EMBEDDINGS GENERADOS:", len(embeddings))
 
     add_documents(
-        texts=chunks,
+        texts=texts,
         embeddings=embeddings,
-        metadatas=[metadata] * len(chunks) if metadata else None
+        metadatas=metadatas
     )
 
-    return len(chunks)
+    return len(texts)

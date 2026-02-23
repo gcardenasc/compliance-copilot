@@ -1,64 +1,88 @@
 import re
 
-STRUCTURE_PATTERN = (
-    r"(Art\.?\s*\d+|Artículo\s+\d+|"
-    r"Cap[ií]tulo\s+\w+|Sección\s+\w+|"
-    r"\d+\.\s+[A-Z].+|"           
-    r"Annex\s+[A-Z]|Appendix\s+[A-Z])"
-)
-
 
 def clean_text(text: str) -> str:
-    text = re.sub(r"\r", "\n", text)
+    text = text.replace("\r", "\n")
     text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"[ \t]+", " ", text)
     return text.strip()
 
 
-def split_by_structure(text: str):
-    parts = re.split(STRUCTURE_PATTERN, text, flags=re.IGNORECASE)
+def extract_metadata_from_chunk(chunk: str):
+    metadata = {}
 
-    if len(parts) < 3:
-        return []
+    articulo = re.search(r"\((\d+)\)", chunk)
+    if articulo:
+        metadata["articulo"] = articulo.group(1)
 
+    capitulo = re.search(r"Cap[ií]tulo\s+([A-Z0-9]+)", chunk, re.I)
+    if capitulo:
+        metadata["capitulo"] = capitulo.group(1)
+
+    seccion = re.search(r"Secci[oó]n\s+([A-Z0-9]+)", chunk, re.I)
+    if seccion:
+        metadata["seccion"] = seccion.group(1)
+
+    return metadata
+
+
+def split_large_paragraph(paragraph, max_chars=800):
+    words = paragraph.split()
     chunks = []
-    for i in range(1, len(parts), 2):
-        header = parts[i].strip()
-        body = parts[i + 1] if i + 1 < len(parts) else ""
-        chunks.append(f"{header}\n{body}".strip())
+    current = ""
+
+    for word in words:
+        if len(current) + len(word) + 1 > max_chars:
+            chunks.append(current.strip())
+            current = word
+        else:
+            current += " " + word
+
+    if current:
+        chunks.append(current.strip())
 
     return chunks
 
 
-def chunk_by_length(text: str, size=800, overlap=150):
-    chunks = []
-    start = 0
-
-    while start < len(text):
-        end = start + size
-        chunk = text[start:end].strip()
-
-        if chunk:
-            chunks.append(chunk)
-
-        start += size - overlap
-
-    return chunks
-
-
-def chunking_pipeline(text: str):
+def chunk_text(text, max_chars=800):
     text = clean_text(text)
 
-    structured_chunks = split_by_structure(text)
+    paragraphs = re.split(r"\n\s*\n", text)
 
-    if not structured_chunks:
-        return chunk_by_length(text)
+    chunks = []
+
+    for p in paragraphs:
+        p = p.strip()
+        if not p:
+            continue
+
+        if len(p) > max_chars:
+            chunks.extend(split_large_paragraph(p, max_chars))
+        else:
+            chunks.append(p)
+
+    return chunks
+
+
+def chunking_pipeline(text, page=None, source=None, max_chars=800):
+    chunks = chunk_text(text, max_chars)
 
     final_chunks = []
 
-    for chunk in structured_chunks:
-        if len(chunk) > 1200:
-            final_chunks.extend(chunk_by_length(chunk))
-        else:
-            final_chunks.append(chunk)
+    for chunk in chunks:
+        metadata = extract_metadata_from_chunk(chunk)
+
+        if page:
+            metadata["page"] = page
+
+        if source:
+            metadata["source"] = source
+
+        final_chunks.append({
+            "text": chunk,
+            "metadata": metadata
+        })
+
+    print(f">>> CHUNKS GENERADOS: {len(final_chunks)}")
 
     return final_chunks

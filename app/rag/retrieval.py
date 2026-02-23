@@ -1,24 +1,46 @@
 from app.services.embeddings import embed_text
-from app.rag.vector_store import query
+from app.rag.vector_store import query_documents
+
 
 def retrieve_context(question: str, top_k=5):
     question_embedding = embed_text(question)
-    results = query(question_embedding, top_k=top_k)
+
+    results = query_documents(question_embedding, n_results=top_k)
+
     docs = results.get("documents", [[]])[0]
-    return "\n\n".join(docs)
+    metas = results.get("metadatas", [[]])[0]
+
+    context_parts = []
+
+    for doc, meta in zip(docs, metas):
+        citation = ""
+
+        if meta:
+            page = meta.get("page")
+            source = meta.get("source")
+
+            if source:
+                citation += f"[{source}"
+                if page:
+                    citation += f" - pág. {page}"
+                citation += "]"
+
+        context_parts.append(f"{doc}\n{citation}")
+
+    return "\n\n".join(context_parts)
+
 
 def build_rag_prompt(question, context):
-    rag_promt = f"""
-    Usa SOLO la siguiente información para responder.
-    Si no está en el contexto, di que no puedes responder.
+    return f"""
+Usa SOLO la siguiente información para responder.
+Si la respuesta no está explícitamente en el contexto, di:
+"No puedo responder con la información disponible."
 
-    CONTEXTO:
-    {context}
+CONTEXTO:
+{context}
 
-    PREGUNTA:
-    {question}
+PREGUNTA:
+{question}
 
-    RESPUESTA:
-    """
-    print("CONTEXT:", context)
-    return rag_promt
+RESPUESTA:
+"""

@@ -1,12 +1,14 @@
 import chromadb
-from chromadb.config import Settings
+import uuid
 
-client = chromadb.Client(Settings(persist_directory="./data/chroma"))
+client = chromadb.Client()
+collection = client.get_or_create_collection("documents")
 
-collection = client.get_or_create_collection(name="documents")
 
-def add_documents(texts, embeddings, metadatas=None):
-    ids = [str(i) for i in range(len(texts))]
+def add_documents(texts, embeddings, metadatas):
+
+    ids = [str(uuid.uuid4()) for _ in texts]
+
     collection.add(
         documents=texts,
         embeddings=embeddings,
@@ -14,9 +16,9 @@ def add_documents(texts, embeddings, metadatas=None):
         ids=ids
     )
 
-def query(query_embedding, top_k=5):
-    results = collection.query(
-        query_embeddings=query_embedding,
-        n_results=top_k
+
+def query_documents(query_embedding, n_results=5):
+    return collection.query(
+        query_embeddings=[query_embedding],
+        n_results=n_results
     )
-    return results
