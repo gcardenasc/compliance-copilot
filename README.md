@@ -1,4 +1,4 @@
-# ⚖️ Regulatory Analysis Workbench (Compliance Copilot)
+# Regulatory Analysis Workbench (Compliance Copilot)
 
 This is a small project born out of a personal need to have a simple tool to use an LLM with confidential PDFs.
 
@@ -6,7 +6,7 @@ With this, I wanted to experiment with the concepts of Agentic RAG and a Hybrid 
 
 The result is this, an Agentic-RAG system designed for compliance and regulatory risk analysis. It automates the process of extracting, searching, and analyzing complex regulatory documents (like DORA or MiCA) with high precision and transparency.
 
-## 🚀 Key Functionalities
+## Key Functionalities
 
 - **Intelligent Document Ingestion**: Supports PDF and DOCX formats. It performs **Stateful Chunking** to robustly link article numbers with their titles even across different paragraphs.
 - **Agentic Reasoning**: Powered by a sophisticated agent loop that uses specialized tools to gather evidence, explore context, and synthesize technical answers.
@@ -16,7 +16,7 @@ The result is this, an Agentic-RAG system designed for compliance and regulatory
 - **Document Mapping**: Generates an automatic outline (Table of Contents) of the document to help the agent orient itself during the analysis.
 - **Anti-Loop & Robustness**: Includes mechanisms to prevent repetitive tool calls and advanced JSON extraction logic to handle various LLM response styles.
 
-## 🛠️ Technical Stack & Techniques
+## Technical Stack & Techniques
 
 - **Backend**: Python with **FastAPI**.
 - **Frontend**: **Streamlit** for a rich, interactive user interface.
@@ -27,13 +27,13 @@ The result is this, an Agentic-RAG system designed for compliance and regulatory
 - **Chunking Strategy**: Rule-based segmentation with metadata propagation (article/chapter tracking).
 - **Tool Calling**: Native tool-use implementation for recursive search and context exploration.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Python 3.12+** (managed with `uv`).
 - **LM Studio** or any OpenAI-compatible server running locally on port `1234`.
 - **Docker & Docker Compose** (for containerized deployment).
 
-## 🛠️ Installation
+## Installation
 
 ```bash
 # Clone the repository
