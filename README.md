@@ -44,7 +44,7 @@ cd Compliance_Copilot
 uv sync
 ```
 
-## 🚀 Execution
+## Execution
 
 ### Local (Manual)
 
