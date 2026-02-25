@@ -1,11 +1,14 @@
+import os
 from openai import OpenAI
 
 class LLMService:
 
     def __init__(self, model="meta-llama-3.1-8b-instruct"):
+        # Usamos variable de entorno para la URL, útil para Docker
+        base_url = os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234/v1")
         self.client = OpenAI(
-            base_url="http://localhost:1234/v1",
-            api_key="lm-studio"  # puede ser cualquier string
+            base_url=base_url,
+            api_key="lm-studio"
         )
         self.model = model
 
@@ -15,5 +18,5 @@ class LLMService:
             messages=messages,
             tools=tools,
             tool_choice=tool_choice,
-            temperature=0.0  # Respuesta determinista para cumplimiento
+            temperature=0.0
         )
