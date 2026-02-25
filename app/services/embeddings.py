@@ -9,7 +9,7 @@ client = OpenAI(
 
 EMBEDDING_MODEL = os.getenv(
     "EMBEDDING_MODEL",
-    "text-embedding-nomic-embed-text-v1.5"
+    "text-embedding-bge-m3"
 )
 
 def embed_texts(texts: list[str]):

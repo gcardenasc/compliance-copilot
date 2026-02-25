@@ -22,10 +22,11 @@ def add_documents(documents, embeddings, metadatas):
         ids=ids
     )
 
-def query_collection(embedding, top_k=5):
+def query_collection(embedding, top_k=5, where=None):
     return collection.query(
         query_embeddings=[embedding],
-        n_results=top_k
+        n_results=top_k,
+        where=where
     )
 
 def get_by_metadata(where: dict):

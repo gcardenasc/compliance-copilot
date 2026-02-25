@@ -1,0 +1,29 @@
+/* UI Professional Financial Style */
+body {
+    background-color: #0d1117;
+}
+
+.stApp {
+    background: #0d1117;
+    color: #e6edf3;
+}
+
+/* Regulatory Citation Card */
+.citation-card {
+    border-left: 3px solid #3081f1;
+    background: #161b22;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.stMetric {
+    background: #161b22;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #30363d;
+}
+
+.confidence-high { color: #238636; font-weight: bold; }
+.confidence-mid  { color: #d29922; font-weight: bold; }
+.confidence-low  { color: #da3633; font-weight: bold; }
