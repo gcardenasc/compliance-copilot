@@ -10,7 +10,8 @@ services:
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - HF_TOKEN=${HF_TOKEN}
-      - EMBEDDING_MODEL=BAAI/bge-m3
+      - LLM_MODEL=llama-3.3-70b-versatile
+      - EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 
   frontend:
     build:
