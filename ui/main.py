@@ -28,6 +28,10 @@ with st.sidebar:
     strict_mode = st.toggle("Strict Compliance Mode", value=True, help="Only answers if explicit support exists in the text.")
     threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.7)
 
+    st.divider()
+    st.markdown("### 🔗 Project Links")
+    st.markdown("[GitHub Repository](https://github.com/gcardenasc/compliance-copilot/tree/feature/cloud-hybrid-llm)")
+
 # --- MAIN INTERFACE ---
 st.title("⚖️ Regulatory Analysis Workbench")
 st.caption("Agentic-RAG System for Compliance and Risk Analysis")
