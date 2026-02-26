@@ -8,10 +8,9 @@ services:
     volumes:
       - ./data:/app/data
     environment:
-      - LMSTUDIO_BASE_URL=http://host.docker.internal:1234/v1
-      - EMBEDDING_MODEL=text-embedding-bge-m3
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - HF_TOKEN=${HF_TOKEN}
+      - EMBEDDING_MODEL=BAAI/bge-m3
 
   frontend:
     build:

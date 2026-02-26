@@ -1,27 +1,18 @@
 import os
-from openai import OpenAI
+import requests
 
-# LM Studio OpenAI-compatible endpoint
-client = OpenAI(
-    base_url=os.getenv("LMSTUDIO_BASE_URL", "http://localhost:1234/v1"),
-    api_key="lm-studio"
-)
-
-EMBEDDING_MODEL = os.getenv(
-    "EMBEDDING_MODEL",
-    "text-embedding-bge-m3"
-)
+HF_TOKEN = os.getenv("HF_TOKEN")
+# Modelo multilingüe potente
+EMBEDDING_MODEL = "BAAI/bge-m3"
+API_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{EMBEDDING_MODEL}"
 
 def embed_texts(texts: list[str]):
-    response = client.embeddings.create(
-        model=EMBEDDING_MODEL,
-        input=texts
-    )
-    return [e.embedding for e in response.data]
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    response = requests.post(API_URL, headers=headers, json={"inputs": texts, "options": {"wait_for_model": True}})
+    return response.json()
 
 def embed_query(query: str):
-    response = client.embeddings.create(
-        model=EMBEDDING_MODEL,
-        input=query
-    )
-    return response.data[0].embedding
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    response = requests.post(API_URL, headers=headers, json={"inputs": [query], "options": {"wait_for_model": True}})
+    # Retornamos el primer (y único) embedding
+    return response.json()[0]

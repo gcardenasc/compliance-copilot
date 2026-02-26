@@ -1,4 +1,8 @@
 from fastapi import FastAPI
+from dotenv import load_dotenv
+
+# Cargar variables de entorno al inicio
+load_dotenv()
 
 from app.api.upload import router as upload_router
 from app.api.qa import router as qa_router
