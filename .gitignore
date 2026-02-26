@@ -16,3 +16,25 @@ data/vectordb/*
 data/
 *.db
 *.sqlite
+
+# Environment variables
+.env
+.env.*
+.env.local
+
+# Secrets
+secrets.yaml
+config.local.py
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Render local files
+.render
