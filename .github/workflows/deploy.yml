@@ -1,4 +1,39 @@
-with:
-  host: ${{ secrets.VPS_HOST }}
-  username: ${{ secrets.VPS_USER }}
-  key: ${{ secrets.VPS_SSH_KEY }}
+name: Deploy to GCP VM (Demo Cloud)
+
+on:
+  push:
+    branches:
+      - demo/cloud
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to VM
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /home/deployer/app
+
+            echo "Pulling latest code..."
+            git fetch origin
+            git checkout demo/cloud
+            git pull origin demo/cloud
+
+            echo "Rebuilding containers..."
+            docker compose down
+            docker compose up -d --build
+
+            echo "Cleaning unused images..."
+            docker image prune -f
+          EOF

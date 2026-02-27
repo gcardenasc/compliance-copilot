@@ -1,7 +1,7 @@
 import requests
 import os
 
-BASE_URL = os.getenv("API_URL", "https://compliance-copilot-6wrw.onrender.com/api")
+BASE_URL = os.getenv("API_URL", "http://backend:8000/api")
 
 class ComplianceAPIClient:
     def __init__(self):
