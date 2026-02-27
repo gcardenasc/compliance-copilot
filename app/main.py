@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Cargar variables de entorno al inicio
 load_dotenv()
+
+# Asegurar que los directorios de datos existen
+for path in ["data/raw", "data/chroma"]:
+    Path(path).mkdir(parents=True, exist_ok=True)
 
 from app.api.upload import router as upload_router
 from app.api.qa import router as qa_router
