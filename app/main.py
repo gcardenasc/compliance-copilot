@@ -11,7 +11,7 @@ for path in ["data/raw", "data/chroma"]:
 
 from app.api.upload import router as upload_router
 from app.api.qa import router as qa_router
-
+ 
 
 app = FastAPI(
     title="Compliance Copilot API",
